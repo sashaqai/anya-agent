@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Аня — Личный агент роста</title>
+<style>
+  :root {
+    --bg: #16131F;
+    --bg2: #1D1928;
+    --bg3: #252033;
+    --border: rgba(190,170,220,0.14);
+    --accent: #B9A2DB;
+    --accent-light: #DCCDF0;
+    --gold: #D9A0A8;
+    --gold-light: #EFC3C8;
+    --rose: #C77B7B;
+    --green: #7FB88F;
+    --blue: #7F9FD1;
+    --text: #EEEAF4;
+    --text-muted: #A79FB6;
+    --text-dim: #6B6479;
+    --radius: 12px;
+    --radius-sm: 8px;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, 'Helvetica Neue', 'Segoe UI', Roboto, sans-serif;
+    min-height: 100%;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #2A2140 0%, #16131F 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 20px 16px;
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 100;
+  }
+  .header-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; max-width: 700px; margin-left: auto; margin-right: auto; }
+  .avatar {
+    width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--accent), var(--gold));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: var(--bg); font-weight: 700;
+  }
+  .header-info h1 { font-size: 16px; font-weight: 600; }
+  .header-info p { font-size: 12px; color: var(--text-muted); }
+  .tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; max-width: 700px; margin: 0 auto; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: 500;
+    cursor: pointer; white-space: nowrap; flex-shrink: 0;
+    border: 1px solid var(--border); color: var(--text-muted); background: transparent;
+    transition: all .2s; font-family: inherit;
+  }
+  .tab.active { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 600; }
+
+  .main { max-width: 700px; width: 100%; margin: 0 auto; padding-bottom: 60px; }
+  .section { display: none; padding: 16px; }
+  .section.active { display: block; }
+
+  .section-label {
+    font-size: 11px; font-weight: 600; color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px;
+  }
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--accent-light); margin-bottom: 8px; }
+  .card-body { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+  .card-body strong { color: var(--text); }
+
+  .badge { display: inline-block; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; margin: 3px 3px 0 0; }
+  .badge-accent { background: rgba(185,162,219,.15); color: var(--accent-light); }
+  .badge-gold { background: rgba(217,160,168,.15); color: var(--gold-light); }
+  .badge-rose { background: rgba(199,123,123,.15); color: var(--rose); }
+  .badge-green { background: rgba(127,184,143,.15); color: var(--green); }
+
+  .practice-item {
+    background: var(--bg3); border-radius: var(--radius-sm);
+    padding: 12px 14px; margin-bottom: 8px; border-left: 3px solid var(--accent);
+  }
+  .practice-item.gold { border-left-color: var(--gold); }
+  .practice-item.rose { border-left-color: var(--rose); }
+  .practice-item.green { border-left-color: var(--green); }
+  .practice-item.blue { border-left-color: var(--blue); }
+  .practice-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .practice-desc { font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+
+  .step { display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start; }
+  .step-num {
+    width: 24px; height: 24px; flex-shrink: 0; border-radius: 50%;
+    background: var(--accent); color: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; margin-top: 1px;
+  }
+  .step-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .step-desc { font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+
+  .book {
+    display: flex; gap: 12px; background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 12px; margin-bottom: 8px; align-items: flex-start;
+  }
+  .book-icon { width: 36px; height: 36px; flex-shrink: 0; background: var(--bg3); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .book-title { font-size: 13px; font-weight: 600; }
+  .book-author { font-size: 11px; color: var(--text-muted); margin: 2px 0 4px; }
+  .book-why { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+  .tracker-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 16px; }
+  .tracker-day {
+    aspect-ratio: 1; border-radius: 6px; background: var(--bg3); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-dim);
+  }
+  .tracker-day.done { background: rgba(185,162,219,.2); border-color: var(--accent); color: var(--accent-light); }
+  .tracker-day.today { border-color: var(--gold); color: var(--gold); }
+
+  .habit-row {
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+    background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 6px;
+    cursor: pointer;
+  }
+  .habit-check {
+    width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--bg); transition: all .2s;
+  }
+  .habit-check.checked { background: var(--accent); border-color: var(--accent); }
+  .habit-name { flex: 1; font-size: 13px; }
+  .habit-streak { font-size: 11px; color: var(--gold); }
+
+  .goal-input {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    color: var(--text); font-family: inherit; font-size: 13px; padding: 10px 12px; margin-top: 6px; resize: vertical; min-height: 44px;
+  }
+  .goal-input:focus { outline: none; border-color: var(--accent); }
+  .goal-label { font-size: 12px; font-weight: 600; color: var(--accent-light); margin-top: 10px; }
+</style>
+<style>
+  .quote { font-size: 12px; color: var(--text); background: var(--bg3); border-radius: var(--radius-sm); padding: 10px 12px; margin-top: 6px; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="avatar">♑</div>
+    <div class="header-info">
+      <h1>Агент роста · Аня</h1>
+      <p>HR · Карьера · Деньги · Энергия</p>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" data-tab="map">✦ Карта</button>
+    <button class="tab" data-tab="practices">🌙 Практики</button>
+    <button class="tab" data-tab="love">💞 Отношения</button>
+    <button class="tab" data-tab="money">💰 Деньги</button>
+    <button class="tab" data-tab="career">🧭 Призвание</button>
+    <button class="tab" data-tab="books">📚 Книги</button>
+    <button class="tab" data-tab="tracker">✓ Трекер</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- MAP -->
+  <div class="section active" id="section-map">
+    <div class="section-label">Коротко о карте</div>
+
+    <div class="card">
+      <div class="card-title">♑ Кто ты по карте</div>
+      <div class="card-body">
+        <strong>Солнце в Козероге в соединении с Нептуном в 7-м доме.</strong> Ты собранная и ответственная, умеешь доводить дела. При этом многое в жизни раскрывается через близких людей и партнёрство. Ты тонко чувствуешь других и легко подстраиваешься под них.<br><br>
+        <strong>Асцендент в Раке.</strong> Снаружи ты мягкая, заботливая, внимательная. Люди рядом с тобой чувствуют себя в безопасности.<br><br>
+        <strong>Луна в Скорпионе в 5-м доме.</strong> Чувства очень глубокие, сильные и чаще спрятаны. Любишь всерьёз, творчество для тебя тоже способ прожить эмоции.<br><br>
+        <strong>Меркурий, Марс и Уран в Водолее в 8-м доме.</strong> Острый нестандартный ум, интерес к психологии, к тому, что скрыто. Кризисы тебя закаляют и меняют.<br><br>
+        <strong>Венера в Рыбах у MC.</strong> Венера в экзальтации, то есть в самой сильной позиции. Тебя видят через красоту, мягкость, эмпатию. Это ресурс для профессии.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💼 Карта и твоя работа в HR</div>
+      <div class="card-body">
+        Управление персоналом очень точно ложится на карту. <strong>Солнце в 7-м доме</strong> — работа с людьми один на один, переговоры, партнёрство. <strong>Асцендент в Раке</strong> — забота о команде, люди тебе доверяют. <strong>Юпитер в Козероге в 6-м</strong> — сильная сторона в организации, процессах и регламентах. <strong>Меркурий, Марс и Уран в Водолее</strong> — интерес к технологиям и автоматизации, это прямо твоё направление роста.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💪 Сильные стороны</div>
+      <div class="card-body">
+        <span class="badge badge-accent">Эмпатия</span>
+        <span class="badge badge-accent">Ответственность</span>
+        <span class="badge badge-gold">Чувство красоты</span>
+        <span class="badge badge-gold">Обаяние</span>
+        <span class="badge badge-green">Глубина чувств</span>
+        <span class="badge badge-green">Психологическое чутьё</span>
+        <span class="badge badge-rose">Забота о людях</span>
+        <span class="badge badge-rose">Организация проектов</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🌱 Зоны роста</div>
+      <div class="card-body">
+        <strong>Солнце с Нептуном в 7-м.</strong> Риск раствориться в партнёре, идеализировать людей, спасать. Своё «я» легко теряется в «мы».<br><br>
+        <strong>Луна в Скорпионе.</strong> Обиды и тревоги копятся внутри. Сложно просить о поддержке, хочется держать всё под контролем.<br><br>
+        <strong>Венера в квадрате к Плутону.</strong> Любовь на максимум: сильная привязанность, ревность, страх потери. Тема своей ценности в отношениях.<br><br>
+        <strong>Сатурн в Рыбах в 10-м.</strong> Сомнения в своём профессионализме, ощущение «я ещё недостаточно готова». Карьера строится постепенно и становится крепкой с годами.<br><br>
+        <strong>Огня в карте мало (1 планета).</strong> Энергия на старт новых дел приходит через тело и маленькие шаги.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🗺 Данные карты</div>
+      <div class="card-body" style="font-size:12px">
+        15.01.1996 · 15:45 · Олёкминск · Плацидус<br>
+        Асц 19°28′ Рак · MC 3°46′ Рыбы<br>
+        ☉ 24°23′ Козерог (7) · ♆ 25°12′ Козерог (7)<br>
+        ☽ 12°01′ Скорпион (5) · ♇ 2°23′ Стрелец (5)<br>
+        ☿ 2°23′ Водолей R (8) · ♂ 5°21′ Водолей (8) · ♅ 0°10′ Водолей (на куспиде 8-го)<br>
+        ♀ 0°06′ Рыбы (9, у MC) · ♄ 20°29′ Рыбы (10)<br>
+        ♃ 2°40′ Козерог (6)<br>
+        ☊ 21°34′ Весы (5) · ⚷ 14°10′ Весы (5)<br>
+        По планетам: Вода 3 · Земля 3 · Воздух 3 · Огонь 1<br>
+        Источник: astro.com
+      </div>
+    </div>
+  </div>
+
+  <!-- PRACTICES -->
+  <div class="section" id="section-practices">
+    <div class="section-label">Психологические практики</div>
+
+    <div class="practice-item">
+      <div class="practice-title">🔥 Практика на энергию — «Утро в движении»</div>
+      <div class="practice-desc">Утром у тебя больше всего сил, а огня в карте мало. Начни с малого: 10 минут движения сразу после пробуждения, до телефона. Зарядка, растяжка, приседания, танец под одну песню. Через 2 недели добавь ещё 5 минут. Маленький шаг каждый день даёт больше, чем большая тренировка раз в месяц.</div>
+    </div>
+
+    <div class="practice-item rose">
+      <div class="practice-title">📵 Практика на внимание — «Рилсы по расписанию»</div>
+      <div class="practice-desc">Нептун в карте легко уводит в бесконечную ленту. Выдели для рилсов одно время дня, например 20 минут вечером, и поставь лимит в настройках телефона. Утром первые 30 минут — без соцсетей. Когда рука тянется к ленте, спроси себя: я устала, мне скучно или я что-то откладываю? Ответ подскажет, что тебе нужно на самом деле.</div>
+    </div>
+
+    <div class="practice-item gold">
+      <div class="practice-title">📅 Практика на планы — «План с запасом»</div>
+      <div class="practice-desc">Козерога сильнее всего выбивают невыполненные планы. Правило: в плане на день максимум 3 главных дела, и одно из них — запасное. Вечером отмечай, что сделано, и переносишь остальное без самокритики. Раз в неделю смотри: какие планы срываются чаще всего и почему? Часто причина в том, что плана слишком много.</div>
+    </div>
+
+    <div class="practice-item green">
+      <div class="practice-title">🤝 Практика на конфликты — «Три шага»</div>
+      <div class="practice-desc">Асцендент в Раке и Нептун в 7-м доме тяжело переносят напряжение между людьми. В конфликте на работе: 1) факты — что произошло, без оценок; 2) интересы — что важно каждой стороне; 3) следующий шаг — кто, что и к какому сроку делает. После сложного разговора дай себе 10 минут тишины, чтобы сбросить чужие эмоции.</div>
+    </div>
+
+    <div class="practice-item rose">
+      <div class="practice-title">🌊 Практика на чувства — «Назови вслух»</div>
+      <div class="practice-desc">Луна в Скорпионе прячет обиду до последнего. Раз в день напиши одну строку: «Сейчас я чувствую ___, потому что ___». Раз в неделю скажи одно чувство вслух близкому человеку. Так эмоции перестают копиться и взрываться.</div>
+    </div>
+
+    <div class="practice-item gold">
+      <div class="practice-title">🛡 Практика на границы — «Пауза перед да»</div>
+      <div class="practice-desc">Асцендент в Раке хочет позаботиться обо всех сразу. Правило: на любую просьбу отвечай «Я подумаю и скажу через час». За этот час спроси себя: хочу ли я? есть ли у меня силы? Если ответ «нет» — откажи коротко и без оправданий.</div>
+    </div>
+
+    <div class="practice-item blue">
+      <div class="practice-title">🏆 Практика на уверенность — «Я уже умею»</div>
+      <div class="practice-desc">Сатурн в 10-м доме занижает оценку своих навыков. Заведи список «Что я умею и что у меня получилось». Добавляй по одному пункту в день. Перечитывай перед важными разговорами о работе и деньгах.</div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-label">Эзотерические практики</div>
+    <div class="card">
+      <div class="card-body" style="font-size:12px">Это простые ритуалы, привязанные к фазам Луны. Новолуние — время начинать и ставить цели на месяц. Полнолуние — время подводить итоги и отпускать лишнее. По сути это ежемесячная точка планирования и перезагрузки. Даты новолуний и полнолуний есть в любом лунном календаре.</div>
+    </div>
+
+    <div class="practice-item">
+      <div class="practice-title">🌑 Новолуние — намерение</div>
+      <div class="practice-desc">В день новолуния напиши одно намерение на месяц, только про себя, без участия других людей: «Я выделяю 3 часа в неделю на ___». Положи в место, где увидишь каждый день. Козерогу важно, чтобы намерение было конкретным и измеримым.</div>
+    </div>
+
+    <div class="practice-item gold">
+      <div class="practice-title">🌕 Полнолуние — отпускание</div>
+      <div class="practice-desc">Напиши, что держишь слишком долго: старую обиду, чужие ожидания, привязанность к тому, что ушло. Одно предложение. Сожги или порви. Скажи вслух: «Я отпускаю это и освобождаю место для своего». Луне в Скорпионе это особенно нужно.</div>
+    </div>
+
+    <div class="practice-item rose">
+      <div class="practice-title">💧 Вода и тишина</div>
+      <div class="practice-desc">Нептун и Рыбы в карте очень сильны. Раз в неделю устрой себе ванну, бассейн или просто 15 минут у воды в тишине, без телефона. Тебе важно периодически очищаться от чужих эмоций, которые ты впитываешь.</div>
+    </div>
+  </div>
+
+  <!-- LOVE -->
+  <div class="section" id="section-love">
+    <div class="section-label">Ты в отношениях</div>
+
+    <div class="card">
+      <div class="card-title">💞 Как ты любишь</div>
+      <div class="card-body">
+        Солнце в 7-м доме — партнёрство для тебя одна из главных тем жизни. Нептун рядом делает любовь романтичной, жертвенной, с верой в лучшее в человеке. Луна в Скорпионе и Венера в квадрате к Плутону добавляют глубину и силу: если любишь, то целиком.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚠️ Ловушки</div>
+      <div class="card-body">
+        <div class="practice-item">
+          <div class="practice-title">Идеализация</div>
+          <div class="practice-desc">Видишь в человеке потенциал и любишь его будущую версию. Проверка: что он делает уже сейчас?</div>
+        </div>
+        <div class="practice-item gold">
+          <div class="practice-title">Спасательство</div>
+          <div class="practice-desc">Нептун в 7-м тянет помогать, вытаскивать, терпеть. Помощь хороша, пока она взаимна.</div>
+        </div>
+        <div class="practice-item rose">
+          <div class="practice-title">Ревность и контроль</div>
+          <div class="practice-desc">Венера в квадрате к Плутону. Корень обычно в страхе потери. Работает практика «Назови вслух».</div>
+        </div>
+        <div class="practice-item green">
+          <div class="practice-title">Молчаливая обида</div>
+          <div class="practice-desc">Скорпионовская Луна молчит до последнего, потом закрывается. Говори о мелочах сразу, пока они маленькие.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">✅ Что тебе помогает</div>
+      <div class="card-body">
+        <strong>1.</strong> Партнёр, рядом с которым можно быть мягкой и при этом сохранять свои цели.<br><br>
+        <strong>2.</strong> Своё пространство и свои дела внутри отношений. Водолей в 8-м доме нуждается в свободе даже в близости.<br><br>
+        <strong>3.</strong> Честные разговоры о деньгах и общих ресурсах. Это зона 8-го дома, у тебя она активна.<br><br>
+        <strong>4.</strong> Вопрос раз в месяц: «Чего я хочу от этих отношений сейчас?» Отвечай только за себя.
+      </div>
+    </div>
+  </div>
+
+  <!-- MONEY -->
+  <div class="section" id="section-money">
+    <div class="section-label">Цель: +30% к доходу за год</div>
+
+    <div class="card">
+      <div class="card-title">💰 Как деньги устроены у тебя</div>
+      <div class="card-body">
+        <strong>2-й дом во Льве.</strong> Доход растёт, когда тебя и твои результаты видно. Для тебя это главный рычаг.<br><br>
+        <strong>Юпитер в Козероге в 6-м.</strong> Деньги через экспертизу, системность и ежедневную работу. В найме это прямой путь к росту.<br><br>
+        <strong>Сатурн в 10-м.</strong> Склонность скромничать и ждать, что заметят сами. Здесь и спрятаны твои 30%.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🏗 Откуда возьмутся 30%</div>
+      <div class="card-body">
+        <div class="step"><div class="step-num">1</div><div>
+          <div class="step-title">Пересмотр зарплаты на текущей позиции</div>
+          <div class="step-desc">Реально 10–15%, если прийти с результатами в цифрах. Лучшее время — перед годовым планированием бюджета или после закрытого проекта.</div>
+        </div></div>
+        <div class="step"><div class="step-num">2</div><div>
+          <div class="step-title">Новая экспертиза — автоматизация HR</div>
+          <div class="step-desc">HR со знанием автоматизации ценится на рынке выше классического специалиста. Это аргумент и для повышения, и для смены работы.</div>
+        </div></div>
+        <div class="step"><div class="step-num">3</div><div>
+          <div class="step-title">Расширение зоны ответственности</div>
+          <div class="step-desc">Возьми проект, который видно руководству: внедрение системы, онбординг, оценка персонала. Новая ответственность — основание для новой зарплаты.</div>
+        </div></div>
+        Ориентиры по процентам примерные, многое зависит от компании и рынка.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🗣 Как «продавать» свои результаты</div>
+      <div class="card-body">
+        <strong>1. Дневник результатов.</strong> Каждую пятницу 5 минут: что сделала за неделю и что это дало компании. Через полгода у тебя готовый материал для разговора о зарплате.<br><br>
+        <strong>2. Язык цифр.</strong> Переводи свою работу в то, что понятно руководству:
+        <div class="quote">«Сократила время закрытия вакансии с 40 до 25 дней»</div>
+        <div class="quote">«Текучесть в отделе снизилась на 15% после новой программы адаптации»</div>
+        <div class="quote">«Автоматизировала документы по отпускам — минус 6 часов работы в месяц»</div><br>
+        <strong>3. Регулярная видимость.</strong> Раз в месяц короткий отчёт руководителю: 3 результата и 1 план. Без просьбы, по своей инициативе.<br><br>
+        <strong>4. Разговор о повышении.</strong> Структура: мои результаты в цифрах → какую ответственность я взяла → чего я хочу дальше → какая зарплата это отражает. Называй цифру первой и спокойно жди ответа.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💡 Правила</div>
+      <div class="card-body">
+        <strong>Правило 1.</strong> 10% с каждой зарплаты — сразу на отдельный счёт, автоматически.<br><br>
+        <strong>Правило 2.</strong> Подушка на 3 месяца расходов. С ней спокойнее вести переговоры о деньгах.<br><br>
+        <strong>Правило 3.</strong> Раз в год сверяйся с рынком: сколько платят за твою позицию с твоим опытом.<br><br>
+        <strong>Правило 4.</strong> Вкладывай в обучение. Курс по автоматизации HR окупится быстрее любой другой траты.
+      </div>
+    </div>
+  </div>
+
+  <!-- CAREER -->
+  <div class="section" id="section-career">
+    <div class="section-label">Путь: эксперт → повышение</div>
+
+    <div class="card">
+      <div class="card-title">🧭 Призвание по карте</div>
+      <div class="card-body">
+        <strong>MC в Рыбах с Венерой.</strong> Профессия, где нужно чувствовать людей и создавать для них хорошую среду. HR — точное попадание.<br><br>
+        <strong>Сатурн в 10-м.</strong> Карьера растёт ступенями, и каждая ступень прочная. Руководящая позиция в карте заложена, особенно ближе к 30–35 годам.<br><br>
+        <strong>Стеллиум в Водолее.</strong> Технологии и нестандартные решения. Автоматизация HR соединяет обе твои сильные стороны: людей и системы.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📅 Дорожная карта</div>
+      <div class="card-body">
+        <div class="practice-item">
+          <div class="practice-title">Ноябрь 2026 — Январь 2027</div>
+          <div class="practice-desc">Выбрать направление автоматизации: HRM-системы, чат-боты для сотрудников, ИИ в подборе, электронный документооборот. Пройти один курс. Начать дневник результатов.</div>
+        </div>
+        <div class="practice-item gold">
+          <div class="practice-title">Февраль — Июнь 2027</div>
+          <div class="practice-desc">Предложить и запустить на работе один проект автоматизации. Посчитать эффект в часах и деньгах. Первый разговор о пересмотре зарплаты.</div>
+        </div>
+        <div class="practice-item green">
+          <div class="practice-title">Июль — Декабрь 2027</div>
+          <div class="practice-desc">Второй проект. Ты — человек, к которому идут с вопросами по автоматизации HR. Обсуждение с руководителем пути к повышению.</div>
+        </div>
+        <div class="practice-item blue">
+          <div class="practice-title">2028 — 2029</div>
+          <div class="practice-desc">Повышение: руководитель направления, HR-бизнес-партнёр или руководитель HR-отдела.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🤖 Что изучать в автоматизации HR</div>
+      <div class="card-body">
+        <span class="badge badge-accent">HRM-системы</span>
+        <span class="badge badge-accent">Электронный кадровый документооборот</span>
+        <span class="badge badge-gold">ИИ для подбора и описаний вакансий</span>
+        <span class="badge badge-gold">Чат-боты для онбординга</span>
+        <span class="badge badge-green">HR-аналитика и дашборды</span>
+        <span class="badge badge-green">Опросы вовлечённости</span>
+        <span class="badge badge-rose">No-code автоматизация</span>
+        <br><br>
+        Начни с того, что съедает больше всего времени у тебя самой. Первый проект лучше брать маленький и с быстрым видимым результатом.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚙️ Режим работы под твою карту</div>
+      <div class="card-body">
+        <div class="practice-item">
+          <div class="practice-title">Сложное — утром</div>
+          <div class="practice-desc">Утром у тебя пик сил. Обучение, аналитику и важные разговоры ставь на первую половину дня.</div>
+        </div>
+        <div class="practice-item gold">
+          <div class="practice-title">Мероприятия и проекты — твоя сцена</div>
+          <div class="practice-desc">Организация и ведение проектов даются легко. Бери те, что заметны руководству, — так растёт видимость.</div>
+        </div>
+        <div class="practice-item rose">
+          <div class="practice-title">Конфликты — по схеме</div>
+          <div class="practice-desc">Практика «Три шага» во вкладке «Практики». После тяжёлого разговора — пауза и восстановление.</div>
+        </div>
+        <div class="practice-item green">
+          <div class="practice-title">Наставник</div>
+          <div class="practice-desc">Солнце в 7-м доме быстрее растёт рядом с сильным человеком. Найди наставника в HR или в автоматизации.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOOKS -->
+  <div class="section" id="section-books">
+    <div class="section-label">На себя и границы</div>
+
+    <div class="book"><div class="book-icon">🪞</div><div>
+      <div class="book-title">Шесть столпов самооценки</div><div class="book-author">Натаниэль Бранден</div>
+      <div class="book-why">Для Солнца с Нептуном — как опираться на себя, сохраняя близость с людьми.</div>
+    </div></div>
+
+    <div class="book"><div class="book-icon">🛡</div><div>
+      <div class="book-title">Границы</div><div class="book-author">Генри Клауд, Джон Таунсенд</div>
+      <div class="book-why">Практичная книга про «нет» без чувства вины. Для Асцендента в Раке.</div>
+    </div></div>
+
+    <div class="book"><div class="book-icon">🌿</div><div>
+      <div class="book-title">Дары несовершенства</div><div class="book-author">Брене Браун</div>
+      <div class="book-why">Про то, как разрешить себе быть живой и неидеальной. Для Козерога с Сатурном в 10-м.</div>
+    </div></div>
+
+    <div class="section-label" style="margin-top:16px">На отношения и чувства</div>
+
+    <div class="book"><div class="book-icon">💞</div><div>
+      <div class="book-title">Привязанность</div><div class="book-author">Амир Левин, Рэйчел Хеллер</div>
+      <div class="book-why">Почему мы тревожимся в любви. Для Венеры в квадрате к Плутону.</div>
+    </div></div>
+
+    <div class="book"><div class="book-icon">🌊</div><div>
+      <div class="book-title">Эмоциональная гибкость</div><div class="book-author">Сьюзан Дэвид</div>
+      <div class="book-why">Как проживать сильные чувства без подавления. Для Луны в Скорпионе.</div>
+    </div></div>
+
+    <div class="section-label" style="margin-top:16px">На карьеру и HR</div>
+
+    <div class="book"><div class="book-icon">📈</div><div>
+      <div class="book-title">Покажи свою работу!</div><div class="book-author">Остин Клеон</div>
+      <div class="book-why">Как делиться результатами так, чтобы их замечали. Прямо про умение «продавать» себя.</div>
+    </div></div>
+
+    <div class="book"><div class="book-icon">🤝</div><div>
+      <div class="book-title">Трудные разговоры</div><div class="book-author">Дуглас Стоун, Брюс Паттон, Шейла Хин</div>
+      <div class="book-why">Как вести конфликтные разговоры и не выгорать. Для работы в HR — настольная книга.</div>
+    </div></div>
+
+    <div class="book"><div class="book-icon">🧠</div><div>
+      <div class="book-title">Работа рулит!</div><div class="book-author">Ласло Бок</div>
+      <div class="book-why">Как Google построил HR на данных. Для направления «автоматизация и HR-аналитика».</div>
+    </div></div>
+
+    <div class="book"><div class="book-icon">🔄</div><div>
+      <div class="book-title">Атомные привычки</div><div class="book-author">Джеймс Клир</div>
+      <div class="book-why">Как завести спорт и уменьшить время в ленте через маленькие шаги.</div>
+    </div></div>
+  </div>
+
+  <!-- TRACKER -->
+  <div class="section" id="section-tracker">
+    <div class="section-label">Привычки на сегодня</div>
+    <div id="habits-list"></div>
+
+    <div class="divider"></div>
+    <div class="section-label">Прогресс недели</div>
+    <div class="tracker-grid" id="tracker-grid"></div>
+
+    <div class="card">
+      <div class="card-title">📊 Мои цели</div>
+      <div class="card-body">
+        Можно менять — сохраняется на этом устройстве.
+        <div class="goal-label">На этот месяц</div>
+        <textarea class="goal-input" id="goal-month" >Выбрать направление автоматизации HR и курс. Начать дневник результатов. Двигаться 10 минут каждое утро.</textarea>
+        <div class="goal-label">На 3 месяца</div>
+        <textarea class="goal-input" id="goal-quarter" >Пройти курс. Предложить первый проект автоматизации на работе.</textarea>
+        <div class="goal-label">На год</div>
+        <textarea class="goal-input" id="goal-year" >+30% к доходу. Экспертиза в автоматизации HR. Через 3 года — повышение в должности.</textarea>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function load(key, fallback) {
+  try { const v = localStorage.getItem(key); return v !== null ? JSON.parse(v) : fallback; }
+  catch (e) { return fallback; }
+}
+function save(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+}
+
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('section-' + btn.dataset.tab).classList.add('active');
+    btn.classList.add('active');
+    window.scrollTo(0, 0);
+  });
+});
+
+const habits = [
+  { id: 'h1', name: '10 минут движения утром', emoji: '🔥' },
+  { id: 'h2', name: 'Первые 30 минут без соцсетей', emoji: '📵' },
+  { id: 'h3', name: 'Рилсы — не больше 20 минут', emoji: '⏱' },
+  { id: 'h4', name: '20 минут на автоматизацию HR', emoji: '🤖' },
+  { id: 'h5', name: 'Максимум 3 главных дела в плане', emoji: '📅' },
+  { id: 'h6', name: 'Записала результат дня', emoji: '🏆' },
+];
+
+const today = new Date().toDateString();
+let checkedToday = load('anya_habits_' + today, {});
+let streaks = load('anya_streaks', {});
+
+function renderHabits() {
+  const list = document.getElementById('habits-list');
+  list.innerHTML = '';
+  habits.forEach(h => {
+    const done = !!checkedToday[h.id];
+    const streak = streaks[h.id] || 0;
+    const row = document.createElement('div');
+    row.className = 'habit-row';
+    row.innerHTML =
+      '<div class="habit-check ' + (done ? 'checked' : '') + '">' + (done ? '✓' : '') + '</div>' +
+      '<div class="habit-name">' + h.emoji + ' ' + h.name + '</div>' +
+      (streak > 1 ? '<div class="habit-streak">🔥 ' + streak + '</div>' : '');
+    row.addEventListener('click', () => toggleHabit(h.id));
+    list.appendChild(row);
+  });
+}
+
+function toggleHabit(id) {
+  checkedToday[id] = !checkedToday[id];
+  save('anya_habits_' + today, checkedToday);
+  streaks[id] = checkedToday[id] ? (streaks[id] || 0) + 1 : Math.max(0, (streaks[id] || 1) - 1);
+  save('anya_streaks', streaks);
+  renderHabits();
+  renderTracker();
+}
+
+function renderTracker() {
+  const grid = document.getElementById('tracker-grid');
+  grid.innerHTML = '';
+  const days = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  const now = new Date();
+  const dow = (now.getDay() + 6) % 7;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - dow + i);
+    const data = load('anya_habits_' + d.toDateString(), {});
+    const count = Object.values(data).filter(Boolean).length;
+    const cell = document.createElement('div');
+    cell.className = 'tracker-day' + (d.toDateString() === today ? ' today' : '') + (count >= 4 ? ' done' : '');
+    cell.textContent = days[i];
+    cell.title = count + '/' + habits.length;
+    grid.appendChild(cell);
+  }
+}
+
+['goal-month', 'goal-quarter', 'goal-year'].forEach(id => {
+  const el = document.getElementById(id);
+  const saved = load('anya_v2_' + id, null);
+  if (saved !== null) el.value = saved;
+  el.addEventListener('input', () => save('anya_v2_' + id, el.value));
+});
+
+renderHabits();
+renderTracker();
+</script>
+</body>
+</html>
